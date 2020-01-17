@@ -6,7 +6,7 @@ import getopt
 import requests
 
 class ZoomEye(object):
-	def __init__(self, username=None, password=None):
+	def __init__(self, username=None, password=None, filename):
 		self.username = username
 		self.password = password
 		self.token = ""
@@ -18,6 +18,10 @@ class ZoomEye(object):
 		resp = requests.post(self.zoomeye_login_api, data=login_data)
 		if resp and resp.status_code == 200 and 'access_token' in resp.json():
 			self.token = resp.json().get('access_token')
+			print("\033[0;32m[+] --------Login Success--------\033[0m")
+		else:
+			print("\033[0;31m[-] The Account's Password Maybe is Error!!!\033[0m")
+			exit()
 		return self.token;
 
 	def search(self, keywords, notidc = False):
@@ -27,8 +31,9 @@ class ZoomEye(object):
 			"Authorization": "JWT {}".format(self.token)
 		}
 		# query 20 pages
-		for i in range(50):
+		for i in range(100):
 			page = i
+			print("\033[0;32m[+] Page={}\033[0m".format(page))
 			result = []
 			params = {
 				"query": self.keywords,
@@ -39,22 +44,35 @@ class ZoomEye(object):
 				matches = resp.json().get('matches')
 				result = matches
 				if notidc == False:
-					ip_port(result)
+					ip_port(result, filename)
 				else:
-					ip_port_notidc(result)
+					ip_port_notidc(result, filename)
+			else:
+				print("\033[0;31m[-] Ip Maybe banned!!!\033[0m")
+				print("\033[0;31m[-] status_code is {}\033[0m".format(resp.status_code))
+				exit()
 
-def ip_port(data):
+def ip_port(data, filename):
 	global flag
+	f = open(filename, "a")
 	if data:
 		for i in data:
 			if "200 OK" not in str(i):
 				continue
 			else:
-				print(str(i.get('ip'))+":"+str(i.get("portinfo").get("port")), i.get('geoinfo').get('country').get('code'))
-				#flag += 1
+				url = str(i.get('ip'))+":"+str(i.get("portinfo").get("port"))
+				print(url)
+				f.write(url+"\n")
+				flag += 1
+		print("\033[0;32m[+] {} hosts saved in {}.\033[0m".format(flag, filename))
+		f.close()
+	else:
+		print("\033[0;31m[-] Change Another Account!!!\033[0m")
+		exit()
 
-def ip_port_notidc(data):
+def ip_port_notidc(data, filename):
 	global flag
+	f = open(filename, "a")
 	if data:
 		for i in data:
 			if "'idc': 'IDC'" in str(i):
@@ -63,11 +81,18 @@ def ip_port_notidc(data):
 			elif "200 OK" not in str(i):
 				continue
 			else:	
-				print(str(i.get('ip'))+":"+str(i.get("portinfo").get("port")), i.get('geoinfo').get('country').get('code'))
-				#flag += 1
+				url = str(i.get('ip'))+":"+str(i.get("portinfo").get("port"))
+				print(url)
+				f.write(url+"\n")
+				flag += 1
+		print("\033[0;32m[+] {} hosts saved in {}.\033[0m".format(flag, filename))
+		f.close()
+	else:
+		print("\033[0;31m[-] Change Another Account!!!\033[0m")
+		exit()
 
 def zoomeye_search():
-	opts, args = getopt.getopt(sys.argv[1:], "hnu:p:q:r:", ["help","notidc"])
+	opts, args = getopt.getopt(sys.argv[1:], "hnu:p:q:o:", ["help","notidc"])
 	username = ""
 	password = ""
 	keywords = ""
@@ -78,8 +103,7 @@ def zoomeye_search():
   -u			zoomeye's username
   -p			zoomeye's password
   -q			the keywords for query
-  -c			country, the default is kr
-  -r			host or web, the default is host
+  -o 			export to file
   -n, --notIDC		host not in IDC
   -h, --help		for help
 
@@ -101,8 +125,8 @@ def zoomeye_search():
 			password = value
 		if opt == '-q':
 			keywords = value
-		#if opt == '-r':
-		#	resource = value
+		if opt == '-o':
+			filename = value
 		if opt == '-n' or opt == '--notidc':
 			notidc = True
 		if opt == '-h' or opt == '--help':
@@ -112,10 +136,11 @@ def zoomeye_search():
 	zoomeye.username = username
 	zoomeye.password = password
 	zoomeye.login()
-	zoomeye.search(keywords, notidc)
+	zoomeye.search(keywords, notidc, filename)
 
 if __name__ == "__main__":
-	#global flag
-	#flag = 0
+	global flag
+	flag = 0
+	print("Start Search......")
 	zoomeye_search()
 	#print(flag)
