@@ -6,7 +6,7 @@ import getopt
 import requests
 
 class ZoomEye(object):
-	def __init__(self, username=None, password=None, filename):
+	def __init__(self, username=None, password=None):
 		self.username = username
 		self.password = password
 		self.token = ""
@@ -24,7 +24,7 @@ class ZoomEye(object):
 			exit()
 		return self.token;
 
-	def search(self, keywords, notidc = False):
+	def search(self, keywords, notidc = False, filename = "hosts.txt"):
 		self.keywords = keywords
 
 		headers = {
@@ -91,7 +91,7 @@ def ip_port_notidc(data, filename):
 		print("\033[0;31m[-] Change Another Account!!!\033[0m")
 		exit()
 
-def zoomeye_search():
+def main():
 	opts, args = getopt.getopt(sys.argv[1:], "hnu:p:q:o:", ["help","notidc"])
 	username = ""
 	password = ""
@@ -132,6 +132,7 @@ def zoomeye_search():
 		if opt == '-h' or opt == '--help':
 			print(for_help)
 
+	print("Start Search......")
 	zoomeye = ZoomEye()
 	zoomeye.username = username
 	zoomeye.password = password
@@ -141,6 +142,5 @@ def zoomeye_search():
 if __name__ == "__main__":
 	global flag
 	flag = 0
-	print("Start Search......")
-	zoomeye_search()
+	main()
 	#print(flag)
