@@ -31,7 +31,7 @@ class ZoomEye(object):
 			"Authorization": "JWT {}".format(self.token)
 		}
 		# query 20 pages
-		for i in range(100):
+		for i in range(500):
 			page = i
 			print("\033[0;32m[+] Page={}\033[0m".format(page))
 			result = []
@@ -48,7 +48,7 @@ class ZoomEye(object):
 				else:
 					ip_port_notidc(result, filename)
 			else:
-				print("\033[0;31m[-] Ip Maybe banned!!!\033[0m")
+				print("\033[0;31m[-] The page maybe is not exist!!!\033[0m")
 				print("\033[0;31m[-] status_code is {}\033[0m".format(resp.status_code))
 				exit()
 
@@ -103,15 +103,15 @@ def main():
   -u			zoomeye's username
   -p			zoomeye's password
   -q			the keywords for query
-  -o 			export to file
+  -o 			export to file, default hosts.txt
   -n, --notIDC		host not in IDC
   -h, --help		for help
 
   Some country code: KR,IN,CA,JP,RU,VN,PH,MY,ID,TH,MM,PK,KZ,IR,SA,BR,MX,DK,DE,FR,EXT.
 
-  Usage: python3 ZoomeyeSearch.py -u foo@foo.com -p yourpassword -q "jboss country:KR"        # all host
-  Usage: python3 ZoomeyeSearch.py -u foo@foo.com -p yourpassword -n -q "jboss country:KR"     # besides IDC
-  Usage: python3 ZoomeyeSearch.py -u foo@foo.com -p yourpassword -n -q "port:3306 country:KR"
+  Usage: python3 ZoomeyeSearch.py -u foo@foo.com -p yourpassword -q "jboss country:KR -o xx_host.txt"        # all host
+  Usage: python3 ZoomeyeSearch.py -u foo@foo.com -p yourpassword -n -q "jboss country:KR -o xx_host.txt"     # besides IDC
+  Usage: python3 ZoomeyeSearch.py -u foo@foo.com -p yourpassword -n -q "port:3306 country:KR -o xx_host.txt"
   ext.
 	"""
 	if len(sys.argv) <= 4:
