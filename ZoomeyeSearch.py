@@ -41,6 +41,7 @@ class ZoomEye(object):
 			}
 			resp = requests.get(self.zoomeye_search_api, params=params, headers=headers)
 			if resp and resp.status_code == 200 and 'matches' in resp.json():
+				#print(resp.json())
 				matches = resp.json().get('matches')
 				result = matches
 				if notidc == False:
@@ -67,7 +68,7 @@ def ip_port(data, filename):
 		print("\033[0;32m[+] {} hosts saved in {}.\033[0m".format(flag, filename))
 		f.close()
 	else:
-		print("\033[0;31m[-] Change Another Account!!!\033[0m")
+		print("\033[0;31m[-] Maybe Try Change Another Account!!!\033[0m")
 		exit()
 
 def ip_port_notidc(data, filename):
@@ -88,7 +89,7 @@ def ip_port_notidc(data, filename):
 		print("\033[0;32m[+] {} hosts saved in {}.\033[0m".format(flag, filename))
 		f.close()
 	else:
-		print("\033[0;31m[-] Change Another Account!!!\033[0m")
+		print("\033[0;31m[-] Maybe Try Change Another Account!!!\033[0m")
 		exit()
 
 def main():
@@ -96,7 +97,7 @@ def main():
 	username = ""
 	password = ""
 	keywords = ""
-	#resource = "host"
+	filename = ""
 	notidc 	 = False
 	for_help = """
   Options:
@@ -109,14 +110,14 @@ def main():
 
   Some country code: KR,IN,CA,JP,RU,VN,PH,MY,ID,TH,MM,PK,KZ,IR,SA,BR,MX,DK,DE,FR,EXT.
 
-  Usage: python3 ZoomeyeSearch.py -u foo@foo.com -p yourpassword -q "jboss country:KR -o xx_host.txt"        # all host
-  Usage: python3 ZoomeyeSearch.py -u foo@foo.com -p yourpassword -n -q "jboss country:KR -o xx_host.txt"     # besides IDC
-  Usage: python3 ZoomeyeSearch.py -u foo@foo.com -p yourpassword -n -q "port:3306 country:KR -o xx_host.txt"
+  Usage: python3 ZoomeyeSearch.py -u foo@foo.com -p yourpassword -q "jboss +country:\"KR\"" -o xx_host.txt        # all host
+  Usage: python3 ZoomeyeSearch.py -u foo@foo.com -p yourpassword -n -q "jboss +country:\"KR\"" -o xx_host.txt     # besides IDC
+  Usage: python3 ZoomeyeSearch.py -u foo@foo.com -p yourpassword -n -q "port:3389 +country:\"KR\"" -o xx_host.txt
   ext.
 	"""
 	if len(sys.argv) <= 4:
-			print(for_help)
-			exit()
+		print(for_help)
+		exit()
 
 	for opt,value in opts:
 		if opt == '-u':
@@ -133,11 +134,15 @@ def main():
 			print(for_help)
 
 	print("Start Search......")
+	print(keywords)
 	zoomeye = ZoomEye()
 	zoomeye.username = username
 	zoomeye.password = password
 	zoomeye.login()
-	zoomeye.search(keywords, notidc, filename)
+	if filename == "":
+		zoomeye.search(keywords, notidc)
+	else:
+		zoomeye.search(keywords, notidc, filename)
 
 if __name__ == "__main__":
 	global flag
